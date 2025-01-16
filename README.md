@@ -1,4 +1,5 @@
-# Projeto acadêmico realizado com o objetivo de Captar a temperatura atual de São Paulo e salvar os dados em um arquivo do Excel, com uma interface para o usuário.  
+# Captador de Temperatura de São Paulo
+Projeto acadêmico realizado com o objetivo de Captar a temperatura atual de São Paulo e salvar os dados em um arquivo do Excel, com uma interface para o usuário.  
 Os dados coletados foram:  
 - Temperatura;  
 - Umidade do ar;
