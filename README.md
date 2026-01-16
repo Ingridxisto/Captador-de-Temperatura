@@ -1,4 +1,4 @@
-# Captador de Temperatura de São Paulo
+# Sistema de Monitoramento de Temperatura com Coleta e Análise de Dados
 Projeto acadêmico realizado com o objetivo de Captar a temperatura atual de São Paulo e salvar os dados em um arquivo do Excel, com uma interface para o usuário.  
 Os dados coletados foram:  
 - Temperatura;  
