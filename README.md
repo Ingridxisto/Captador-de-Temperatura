@@ -78,7 +78,7 @@ python clima.py
 
 A aplicação possui uma interface simples e intuitiva, permitindo que o usuário informe a cidade desejada e visualize o clima em tempo real.
 
-(imagem aqui)
+![Interface do Captador de Temperatura](screenshots/captador-de-temperatura.png)
 
 ---
 
