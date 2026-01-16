@@ -1,108 +1,98 @@
 import tkinter as tk
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
+import requests
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
 from datetime import datetime
 import os
 
+API_KEY = "d6f5737cf841c40b73c88da299ede8a2"
+ARQUIVO_EXCEL = "dados_climaticos.xlsx"
 
-# Pesquisa e coleta todos os dados
+
 def buscar_clima():
-    navegador = webdriver.Chrome()
+    cidade = entrada_cidade.get().strip()
 
-    # Acessa o site
-    navegador.get('https://www.google.com')
+    if not cidade:
+        cidade = "São Paulo"
 
-    # Pesquisa pela temperatura em São Paulo
-    navegador.find_element(By.XPATH, '//*[@id="APjFqb"]').send_keys('Temperatura em São Paulo')
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={cidade}&appid={API_KEY}&units=metric&lang=pt_br"
+    )
 
-    # Envia a pesquisa
-    navegador.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[3]/center/input[1]').send_keys(Keys.ENTER)
+    resposta = requests.get(url)
+    dados = resposta.json()
 
-    # Captura os dados
-    temperatura = navegador.find_element(By.XPATH, '//*[@id="wob_tm"]').text
-    umidade = navegador.find_element(By.XPATH, '//*[@id="wob_hm"]').text
-    ceu = navegador.find_element(By.XPATH, '//*[@id="wob_dc"]').text
-    alertas = navegador.find_element(By.XPATH, '//*[@id="wob_wc"]/div[4]/div[1]').text
+    if resposta.status_code != 200:
+        label_resultado.config(text="❌ Cidade não encontrada.")
+        return
 
-    # Exibe os dados no console (opcional)
-    print(f'Temperatura: {temperatura}°C\nUmidade do ar: {umidade}\nCéu: {ceu}\nAlertas: {alertas}')
+    temperatura = dados["main"]["temp"]
+    umidade = dados["main"]["humidity"]
+    ceu = dados["weather"][0]["description"].capitalize()
 
-    # Chama a função para salvar os dados na planilha
-    salvar_dados(temperatura, umidade, ceu, alertas)
+    label_resultado.config(
+        text=(
+            f"📍 Cidade: {cidade}\n"
+            f"🌡 Temperatura: {temperatura} °C\n"
+            f"💧 Umidade: {umidade}%\n"
+            f"☁ Céu: {ceu}"
+        )
+    )
 
-    # Fecha o navegador após coletar os dados
-    navegador.quit()
+    salvar_dados(cidade, temperatura, umidade, ceu)
 
 
-# Salva os dados coletados em uma planilha
-def salvar_dados(temperatura, umidade, ceu, alertas):
-    arquivo_nome = 'dados_climaticos.xlsx'
-
-    # Verifica se o arquivo já existe
-    if not os.path.exists(arquivo_nome):
-        # Cria um novo arquivo e uma planilha
+def salvar_dados(cidade, temperatura, umidade, ceu):
+    if not os.path.exists(ARQUIVO_EXCEL):
         arquivo = Workbook()
         planilha = arquivo.active
-        planilha.title = 'Sheet1'
+        planilha.title = "Clima"
 
-        # Cabeçalhos
-        cabecalhos = ['Data e Hora', 'Temperatura', 'Umidade', 'Céu', 'Alertas']
-        for col_num, cabecalho in enumerate(cabecalhos, start=1):
-            cell = planilha.cell(row=1, column=col_num)
+        cabecalhos = ["Data e Hora", "Cidade", "Temperatura (°C)", "Umidade (%)", "Condição do Céu"]
+        for col, cabecalho in enumerate(cabecalhos, start=1):
+            cell = planilha.cell(row=1, column=col)
             cell.value = cabecalho
-            cell.border = Border(left=Side(style='thin'),
-                                 right=Side(style='thin'),
-                                 top=Side(style='thin'),
-                                 bottom=Side(style='thin'))
-            cell.fill = PatternFill(start_color='FFD700', end_color='FFD700', fill_type='solid')
-
+            cell.border = Border(
+                left=Side(style="thin"),
+                right=Side(style="thin"),
+                top=Side(style="thin"),
+                bottom=Side(style="thin"),
+            )
+            cell.fill = PatternFill(start_color="FFD700", fill_type="solid")
     else:
-        # Abre o arquivo existente
-        arquivo = load_workbook(arquivo_nome)
-        planilha = arquivo['Sheet1']
+        arquivo = load_workbook(ARQUIVO_EXCEL)
+        planilha = arquivo["Clima"]
 
-    # Data e hora atual
-    data_hora = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    linha = planilha.max_row + 1
+    data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    valores = [data_hora, cidade, temperatura, umidade, ceu]
 
-    # Encontra a próxima linha vazia
-    linha_vazia = planilha.max_row + 1
-
-    # Adiciona os dados na próxima linha
-    valores = [data_hora, f"{temperatura}°C", umidade, ceu, alertas]
-    for col_num, valor in enumerate(valores, start=1):
-        cell = planilha.cell(row=linha_vazia, column=col_num)
+    for col, valor in enumerate(valores, start=1):
+        cell = planilha.cell(row=linha, column=col)
         cell.value = valor
-        cell.border = Border(left=Side(style='thin'),
-                             right=Side(style='thin'),
-                             top=Side(style='thin'),
-                             bottom=Side(style='thin'))
+        cell.border = Border(
+            left=Side(style="thin"),
+            right=Side(style="thin"),
+            top=Side(style="thin"),
+            bottom=Side(style="thin"),
+        )
 
-    # Ajusta a largura das colunas
-    for col in planilha.columns:
-        max_length = max(len(str(cell.value)) for cell in col if cell.value)
-        planilha.column_dimensions[col[0].column_letter].width = max_length + 2
-
-    # Salva a planilha
-    arquivo.save('dados_climaticos.xlsx')
-
-    print("Planilha atualizada com sucesso!!!")
+    arquivo.save(ARQUIVO_EXCEL)
 
 
-# Interface gráfica com tkinter
+# ================= INTERFACE =================
 root = tk.Tk()
-root.title("Captador de temperatura em São Paulo")
-root.geometry("400x100")
+root.title("Consulta de Clima")
+root.geometry("350x260")
 
-# Texto de instrução
-label_instrucoes = tk.Label(root, text="Clique no botão para buscar o clima de São Paulo.")
-label_instrucoes.pack(pady=10)
+tk.Label(root, text="Digite a cidade:", font=("Arial", 10)).pack(pady=5)
+entrada_cidade = tk.Entry(root, width=30)
+entrada_cidade.pack(pady=5)
 
-# Botão para buscar o clima
-botao_buscar = tk.Button(root, text="Buscar Clima", command=buscar_clima)
-botao_buscar.pack(pady=10)
+tk.Button(root, text="Buscar Clima", command=buscar_clima, width=20).pack(pady=10)
 
-# Executa o loop da interface gráfica
+label_resultado = tk.Label(root, text="", font=("Arial", 10))
+label_resultado.pack(pady=10)
+
 root.mainloop()
