@@ -65,7 +65,7 @@ https://openweathermap.org/api
 
 No código, substitua:
 ```bash
-API_KEY = "SUA_API_KEY_AQUI"
+API_KEY = "SUA_CHAVE_API"
 ```
 
 ### 4️⃣ Execute o projeto
