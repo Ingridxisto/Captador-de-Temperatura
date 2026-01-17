@@ -3,9 +3,12 @@ import requests
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
 from datetime import datetime
+from dotenv import load_dotenv
 import os
 
-API_KEY = "SUA_CHAVE_API"
+load_dotenv()
+
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
 ARQUIVO_EXCEL = "dados_climaticos.xlsx"
 
 
