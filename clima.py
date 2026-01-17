@@ -5,7 +5,7 @@ from openpyxl.styles import Border, Side, PatternFill
 from datetime import datetime
 import os
 
-API_KEY = "d6f5737cf841c40b73c88da299ede8a2"
+API_KEY = "SUA_CHAVE_API"
 ARQUIVO_EXCEL = "dados_climaticos.xlsx"
 
 
