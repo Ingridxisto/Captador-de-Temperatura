@@ -30,18 +30,11 @@ O projeto simula um cenário real de automação, substituindo técnicas frágei
 
 ## 🛠️ Tecnologias Utilizadas
 - Python 3  
-- Tkinter  
+- CustomTkinter  
 - Requests  
 - OpenWeatherMap API  
 - OpenPyXL  
-
----
-
-## 🧩 Arquitetura do Projeto
-- Interface gráfica responsável pela interação com o usuário  
-- Função dedicada para consumo da API de clima  
-- Função separada para persistência de dados  
-- Tratamento de erros para cidades inválidas e arquivos inexistentes  
+- python-dotenv  
 
 ---
 
@@ -53,25 +46,56 @@ git clone https://github.com/Ingridxisto/Captador-de-Temperatura.git
 cd Captador-de-Temperatura
 ```
 
-### 2️⃣ Instale as dependências
-```bash
-pip install requests openpyxl
+### 2️⃣ Crie e ative o ambiente virtual (.venv)
+
+Windows (PowerShell):
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-### 3️⃣ Configure a API Key
-
-Crie uma conta gratuita em:
-https://openweathermap.org/api
-
-No código, substitua:
-```bash
-API_KEY = "SUA_CHAVE_API"
+Windows (CMD):
+```cmd
+python -m venv .venv
+.\.venv\Scripts\activate.bat
 ```
 
-### 4️⃣ Execute o projeto
+Linux/Mac (bash/zsh):
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Para desativar:
+```bash
+deactivate
+```
+
+### 3️⃣ Instale as dependências
+```bash
+pip install -r requirements.txt
+```
+
+### 4️⃣ Configure a API Key com .env
+
+Crie um arquivo `.env` na raiz do projeto:
+```
+API_KEY=SUA_CHAVE_API
+```
+
+### 5️⃣ Execute o projeto
 ```bash
 python clima.py
 ```
+
+---
+
+## 🧩 Arquitetura do Projeto
+- Interface gráfica responsável pela interação com o usuário  
+- Função dedicada para consumo da API de clima  
+- Função separada para persistência de dados  
+- Tratamento de erros para cidades inválidas e arquivos inexistentes  
+
 ---
 
 ## 🖼️ Interface
