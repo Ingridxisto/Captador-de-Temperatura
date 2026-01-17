@@ -1,11 +1,13 @@
-import tkinter as tk
+import customtkinter as ctk
 import requests
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
 from datetime import datetime
+from dotenv import load_dotenv
 import os
 
-API_KEY = "SUA_CHAVE_API"
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 ARQUIVO_EXCEL = "dados_climaticos.xlsx"
 
 
@@ -14,6 +16,10 @@ def buscar_clima():
 
     if not cidade:
         cidade = "São Paulo"
+
+    if not API_KEY:
+        label_resultado.configure(text="❌ API_KEY não configurada no .env.")
+        return
 
     url = (
         f"https://api.openweathermap.org/data/2.5/weather"
@@ -24,14 +30,14 @@ def buscar_clima():
     dados = resposta.json()
 
     if resposta.status_code != 200:
-        label_resultado.config(text="❌ Cidade não encontrada.")
+        label_resultado.configure(text="❌ Cidade não encontrada.")
         return
 
     temperatura = dados["main"]["temp"]
     umidade = dados["main"]["humidity"]
     ceu = dados["weather"][0]["description"].capitalize()
 
-    label_resultado.config(
+    label_resultado.configure(
         text=(
             f"📍 Cidade: {cidade}\n"
             f"🌡 Temperatura: {temperatura} °C\n"
@@ -82,17 +88,19 @@ def salvar_dados(cidade, temperatura, umidade, ceu):
 
 
 # ================= INTERFACE =================
-root = tk.Tk()
+ctk.set_appearance_mode("system")
+ctk.set_default_color_theme("blue")
+root = ctk.CTk()
 root.title("Consulta de Clima")
 root.geometry("350x260")
 
-tk.Label(root, text="Digite a cidade:", font=("Arial", 10)).pack(pady=5)
-entrada_cidade = tk.Entry(root, width=30)
+ctk.CTkLabel(root, text="Digite a cidade:", font=("Arial", 10)).pack(pady=5)
+entrada_cidade = ctk.CTkEntry(root, width=220)
 entrada_cidade.pack(pady=5)
 
-tk.Button(root, text="Buscar Clima", command=buscar_clima, width=20).pack(pady=10)
+ctk.CTkButton(root, text="Buscar Clima", command=buscar_clima, width=200).pack(pady=10)
 
-label_resultado = tk.Label(root, text="", font=("Arial", 10))
+label_resultado = ctk.CTkLabel(root, text="", font=("Arial", 10))
 label_resultado.pack(pady=10)
 
 root.mainloop()
